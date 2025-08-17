@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrial Asset Tracker</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-gray: #ecf0f1;
+            --medium-gray: #bdc3c7;
+            --dark-gray: #7f8c8d;
+            --text-color: #333;
+            --border-color: #95a5a6;
+            --panel-bg: #f8f9fa;
+            --metal-dark: #4a4a4a;
+            --metal-medium: #6a6a6a;
+            --metal-light: #8a8a8a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #e0e0e0;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--metal-dark), var(--metal-medium));
+            padding: 15px 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: white;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--panel-bg);
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            overflow: hidden;
+            margin-top: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-section, .data-section {
+            padding: 25px;
+        }
+
+        .form-section {
+            border-bottom: 2px solid var(--medium-gray);
+            background-color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--metal-dark);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 25px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .data-table th, .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .data-table th {
+            background-color: var(--metal-dark);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+
+        .data-table tr:hover {
+            background-color: #d6eaf8;
+        }
+
+        .data-table td {
+            border-right: 1px solid var(--medium-gray);
+        }
+
+        .data-table td:last-child {
+            border-right: none;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(to right, #f5f5f5, #e8e8e8);
+            border-radius: 6px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--accent-color);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 1rem;
+            color: var(--metal-dark);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .stat-card p {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .file-upload {
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 6px;
+            border: 2px dashed var(--medium-gray);
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 30px;
+            border: 2px dashed var(--medium-gray);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(44, 62, 80, 0.05);
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .status-message {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            display: none;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+            border-left-color: #2e7d32;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            display: block;
+            border-left-color: #c62828;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-top: 4px solid var(--accent-color);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--dark-gray);
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--accent-color);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .add-new-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .add-new-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .total-assets {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 20px 15px;
+            }
+        }
+
+        /* Industrial UI elements */
+        .rivet {
+            position: relative;
+        }
+
+        .rivet::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--metal-medium);
+            border-radius: 50%;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--medium-gray);
+            font-weight: 700;
+        }
+
+        /* Animation for status messages */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-message {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>INDUSTRIAL ASSET TRACKER</h1>
+        <div class="total-assets" id="totalAssets">0 ASSETS</div>
+    </header>
+
+    <div class="container">
+        <div class="app-container">
+            <div class="form-section panel">
+                <h2 class="panel-title">ASSET REGISTRATION</h2>
+                <div id="statusMessage" class="status-message"></div>
+                
+                <form id="assetForm">
+                    <div class="form-row">
+                        <div class="form-group rivet">
+                            <label for="site">SITE*</label>
+                            <select id="site" required>
+                                <option value="">SELECT SITE</option>
+                            </select>
+                            <button type="button" class="add-new-btn" id="addSiteBtn">+ ADD</button>
+                        </div>
+                        <div class="form-group rivet">
+                            <label for="area">AREA*</label>
+                            <select id="area" required>
+                                <option value="">SELECT AREA</option>
+                            </select>
+                            <button type="button" class="add-new-btn" id="addAreaBtn">+ ADD</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="machine">MACHINE NAME*</label>
+                            <input type="text" id="machine" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="machineId">MACHINE ID*</label>
+                            <input type="text" id="machineId" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fieldTag">FIELD TAG</label>
+                            <input type="text" id="fieldTag">
+                        </div>
+                    </div>
+
+                    <!-- NEW FIELDS ADDED HERE -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="environment">ENVIRONMENT</label>
+                            <input type="text" id="environment" placeholder="(e.g., Inside building, Under shelter, Exposed to elements)">
+                        </div>
+                        <div class="form-group">
+                            <label for="medium">MEDIUM BEING PROCESSED</label>
+                            <input type="text" id="medium" placeholder="(e.g., Metal, Liquid, Granular material)">
+                        </div>
+                        <div class="form-group">
+                            <label for="atmosphere">ATMOSPHERE</label>
+                            <input type="text" id="atmosphere" placeholder="(e.g., Dust, Heat, Wet, Corrosive)">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">NOTES</label>
+                        <textarea id="notes"></textarea>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-success">SAVE ASSET</button>
+                        <button type="reset">CLEAR FORM</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="data-section">
+                <h2 class="panel-title">ASSET INVENTORY</h2>
+                
+                <div class="stats-container" id="statsContainer">
+                    <!-- Statistics will be populated here -->
+                </div>
+                
+                <div class="panel">
+                    <div class="action-buttons">
+                        <button id="exportBtn">EXPORT TO EXCEL</button>
+                        <button id="importBtn">IMPORT DATA</button>
+                        <button id="clearDataBtn" class="btn-danger">CLEAR ALL DATA</button>
+                    </div>
+                    
+                    <div class="file-upload" id="importSection" style="display: none;">
+                        <label for="fileInput" class="file-upload-label">
+                            <div>CLICK TO SELECT EXCEL FILE</div>
+                            <div style="font-size: 2rem; margin: 10px 0;">📄</div>
+                            <div id="fileName"></div>
+                        </label>
+                        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" class="file-upload-input">
+                        <div class="action-buttons">
+                            <button id="confirmImport" class="btn-success">CONFIRM IMPORT</button>
+                            <button id="cancelImport" class="btn-danger">CANCEL</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>SITE</th>
+                                <th>AREA</th>
+                                <th>MACHINE</th>
+                                <th>MACHINE ID</th>
+                                <th>FIELD TAG</th>
+                                <th>ENVIRONMENT</th>
+                                <th>MEDIUM</th>
+                                <th>ATMOSPHERE</th>
+                                <th>NOTES</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assetTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Site Modal -->
+    <div class="modal" id="siteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ADD NEW SITE</h2>
+                <button class="close-modal" id="closeSiteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newSiteName">SITE NAME*</label>
+                    <input type="text" id="newSiteName" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelAddSite">CANCEL</button>
+                <button id="saveSite" class="btn-success">SAVE SITE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Area Modal -->
+    <div class="modal" id="areaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ADD NEW AREA</h2>
+                <button class="close-modal" id="closeAreaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="newAreaName">AREA NAME*</label>
+                    <input type="text" id="newAreaName" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelAddArea">CANCEL</button>
+                <button id="saveArea" class="btn-success">SAVE AREA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Data Modal -->
+    <div class="modal" id="clearDataModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>CONFIRM DATA CLEARANCE</h2>
+                <button class="close-modal" id="closeClearModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This action will permanently remove ALL asset records.</p>
+                <p style="color: var(--accent-color); font-weight: bold; margin-top: 10px;">THIS OPERATION CANNOT BE UNDONE!</p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelClear">CANCEL</button>
+                <button id="confirmClear" class="btn-danger">CONFIRM CLEARANCE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // DOM elements
+        const assetForm = document.getElementById('assetForm');
+        const assetTableBody = document.getElementById('assetTableBody');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importSection = document.getElementById('importSection');
+        const fileInput = document.getElementById('fileInput');
+        const confirmImport = document.getElementById('confirmImport');
+        const cancelImport = document.getElementById('cancelImport');
+        const fileName = document.getElementById('fileName');
+        const statusMessage = document.getElementById('statusMessage');
+        const totalAssets = document.getElementById('totalAssets');
+        const statsContainer = document.getElementById('statsContainer');
+        const siteSelect = document.getElementById('site');
+        const areaSelect = document.getElementById('area');
+        const addSiteBtn = document.getElementById('addSiteBtn');
+        const addAreaBtn = document.getElementById('addAreaBtn');
+        const siteModal = document.getElementById('siteModal');
+        const areaModal = document.getElementById('areaModal');
+        const closeSiteModal = document.getElementById('closeSiteModal');
+        const closeAreaModal = document.getElementById('closeAreaModal');
+        const newSiteName = document.getElementById('newSiteName');
+        const newAreaName = document.getElementById('newAreaName');
+        const saveSite = document.getElementById('saveSite');
+        const saveArea = document.getElementById('saveArea');
+        const cancelAddSite = document.getElementById('cancelAddSite');
+        const cancelAddArea = document.getElementById('cancelAddArea');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const clearDataModal = document.getElementById('clearDataModal');
+        const closeClearModal = document.getElementById('closeClearModal');
+        const cancelClear = document.getElementById('cancelClear');
+        const confirmClear = document.getElementById('confirmClear');
+
+        // Data storage
+        let assets = [];
+        let sites = [];
+        let areas = [];
+
+        // Load data from localStorage
+        function loadData() {
+            const savedAssets = localStorage.getItem('assetData');
+            const savedSites = localStorage.getItem('siteData');
+            const savedAreas = localStorage.getItem('areaData');
+            
+            assets = savedAssets ? JSON.parse(savedAssets) : [];
+            sites = savedSites ? JSON.parse(savedSites) : ['MAIN PLANT', 'WAREHOUSE', 'PACKAGING'];
+            areas = savedAreas ? JSON.parse(savedAreas) : ['PRODUCTION LINE', 'STORAGE', 'QUALITY CONTROL', 'MAINTENANCE'];
+            
+            renderTable();
+            updateDropdowns();
+            updateStats();
+        }
+
+        // Save data to localStorage
+        function saveAllData() {
+            localStorage.setItem('assetData', JSON.stringify(assets));
+            localStorage.setItem('siteData', JSON.stringify(sites));
+            localStorage.setItem('areaData', JSON.stringify(areas));
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            setTimeout(() => {
+                statusMessage.className = 'status-message';
+            }, 5000);
+        }
+
+        // Update dropdown menus
+        function updateDropdowns() {
+            // Update sites dropdown
+            siteSelect.innerHTML = '<option value="">SELECT SITE</option>';
+            sites.forEach(site => {
+                const option = document.createElement('option');
+                option.value = site;
+                option.textContent = site;
+                siteSelect.appendChild(option);
+            });
+            
+            // Update areas dropdown
+            areaSelect.innerHTML = '<option value="">SELECT AREA</option>';
+            areas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area;
+                areaSelect.appendChild(option);
+            });
+        }
+
+        // Add new asset
+        function addAsset(event) {
+            event.preventDefault();
+            
+            const site = document.getElementById('site').value;
+            const area = document.getElementById('area').value;
+            const machine = document.getElementById('machine').value;
+            const machineId = document.getElementById('machineId').value;
+            const fieldTag = document.getElementById('fieldTag').value;
+            const environment = document.getElementById('environment').value;
+            const medium = document.getElementById('medium').value;
+            const atmosphere = document.getElementById('atmosphere').value;
+            const notes = document.getElementById('notes').value;
+            
+            if (!site || !area || !machine || !machineId) {
+                showStatus('Please fill all required fields', 'error');
+                return;
+            }
+            
+            const newAsset = {
+                id: Date.now().toString(),
+                site,
+                area,
+                machine,
+                machineId,
+                fieldTag,
+                environment,
+                medium,
+                atmosphere,
+                notes
+            };
+            
+            assets.push(newAsset);
+            saveAllData();
+            renderTable();
+            updateStats();
+            assetForm.reset();
+            showStatus('Asset registered successfully', 'success');
+        }
+
+        // Delete asset
+        function deleteAsset(id) {
+            assets = assets.filter(asset => asset.id !== id);
+            saveAllData();
+            renderTable();
+            updateStats();
+            showStatus('Asset record deleted', 'success');
+        }
+
+        // Render table with asset data
+        function renderTable() {
+            assetTableBody.innerHTML = '';
+            
+            if (assets.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="10" style="text-align: center;">NO ASSETS REGISTERED</td>`;
+                assetTableBody.appendChild(row);
+                totalAssets.textContent = '0 ASSETS';
+                return;
+            }
+            
+            assets.forEach(asset => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${asset.site}</strong></td>
+                    <td>${asset.area}</td>
+                    <td><strong>${asset.machine}</strong></td>
+                    <td><code>${asset.machineId}</code></td>
+                    <td>${asset.fieldTag || '-'}</td>
+                    <td>${asset.environment || '-'}</td>
+                    <td>${asset.medium || '-'}</td>
+                    <td>${asset.atmosphere || '-'}</td>
+                    <td>${asset.notes || '-'}</td>
+                    <td>
+                        <button onclick="deleteAsset('${asset.id}')" class="btn-danger">DELETE</button>
+                    </td>
+                `;
+                assetTableBody.appendChild(row);
+            });
+            
+            totalAssets.textContent = `${assets.length} ASSETS`;
+        }
+
+        // Update statistics
+        function updateStats() {
+            // Count machines per site
+            const siteCounts = {};
+            // Count machines per area per site
+            const siteAreaCounts = {};
+            
+            assets.forEach(asset => {
+                // Count per site
+                siteCounts[asset.site] = (siteCounts[asset.site] || 0) + 1;
+                
+                // Count per area per site
+                if (!siteAreaCounts[asset.site]) {
+                    siteAreaCounts[asset.site] = {};
+                }
+                siteAreaCounts[asset.site][asset.area] = (siteAreaCounts[asset.site][asset.area] || 0) + 1;
+            });
+            
+            let statsHTML = '';
+            
+            // Create stats for each site
+            for (const site in siteCounts) {
+                statsHTML += `
+                    <div class="stat-card">
+                        <h3>${site}</h3>
+                        <p>${siteCounts[site]} MACHINES</p>
+                    </div>
+                `;
+                
+                // Create stats for each area in this site
+                for (const area in siteAreaCounts[site]) {
+                    statsHTML += `
+                        <div class="stat-card">
+                            <h3>${site} - ${area}</h3>
+                            <p>${siteAreaCounts[site][area]} UNITS</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            statsContainer.innerHTML = statsHTML || '<div class="stat-card"><h3>NO DATA AVAILABLE</h3></div>';
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            if (assets.length === 0) {
+                showStatus('No data to export', 'error');
+                return;
+            }
+            
+            try {
+                // Prepare data for export
+                const exportData = assets.map(asset => ({
+                    'SITE': asset.site,
+                    'AREA': asset.area,
+                    'MACHINE': asset.machine,
+                    'MACHINE ID': asset.machineId,
+                    'FIELD TAG': asset.fieldTag || '',
+                    'ENVIRONMENT': asset.environment || '',
+                    'MEDIUM': asset.medium || '',
+                    'ATMOSPHERE': asset.atmosphere || '',
+                    'NOTES': asset.notes || ''
+                }));
+                
+                // Create worksheet
+                const ws = XLSX.utils.json_to_sheet(exportData);
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "ASSETS");
+                
+                // Export to file
+                XLSX.writeFile(wb, "INDUSTRIAL_ASSETS.xlsx");
+                showStatus('Data exported successfully', 'success');
+            } catch (error) {
+                showStatus('Export error: ' + error.message, 'error');
+            }
+        }
+
+        // Import from Excel
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            fileName.textContent = file.name;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Get first sheet
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Convert to JSON
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    
+                    // Process imported data
+                    confirmImport.onclick = function() {
+                        if (jsonData.length === 0) {
+                            showStatus('No data found in file', 'error');
+                            return;
+                        }
+                        
+                        const newAssets = jsonData.map(item => ({
+                            id: Date.now().toString() + Math.floor(Math.random() * 1000),
+                            site: item['SITE'] || item['site'] || '',
+                            area: item['AREA'] || item['area'] || '',
+                            machine: item['MACHINE'] || item['machine'] || '',
+                            machineId: item['MACHINE ID'] || item['machineId'] || item['machine ID'] || '',
+                            fieldTag: item['FIELD TAG'] || item['fieldTag'] || '',
+                            environment: item['ENVIRONMENT'] || item['environment'] || '',
+                            medium: item['MEDIUM'] || item['medium'] || '',
+                            atmosphere: item['ATMOSPHERE'] || item['atmosphere'] || '',
+                            notes: item['NOTES'] || item['notes'] || ''
+                        })).filter(asset => asset.site && asset.area && asset.machine && asset.machineId);
+                        
+                        if (newAssets.length === 0) {
+                            showStatus('No valid assets in file', 'error');
+                            return;
+                        }
+                        
+                        // Add any new sites and areas from the import
+                        newAssets.forEach(asset => {
+                            if (!sites.includes(asset.site)) {
+                                sites.push(asset.site);
+                            }
+                            if (!areas.includes(asset.area)) {
+                                areas.push(asset.area);
+                            }
+                        });
+                        
+                        assets = [...assets, ...newAssets];
+                        saveAllData();
+                        updateDropdowns();
+                        renderTable();
+                        updateStats();
+                        importSection.style.display = 'none';
+                        showStatus(`${newAssets.length} assets imported`, 'success');
+                    };
+                } catch (error) {
+                    showStatus('File read error: ' + error.message, 'error');
+                    importSection.style.display = 'none';
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Add new site
+        function addNewSite() {
+            const siteName = newSiteName.value.trim().toUpperCase();
+            if (!siteName) {
+                showStatus('Site name required', 'error');
+                return;
+            }
+            
+            if (!sites.includes(siteName)) {
+                sites.push(siteName);
+                saveAllData();
+                updateDropdowns();
+                siteSelect.value = siteName;
+                siteModal.style.display = 'none';
+                newSiteName.value = '';
+                showStatus('Site added to registry', 'success');
+            } else {
+                showStatus('Site already exists', 'error');
+            }
+        }
+
+        // Add new area
+        function addNewArea() {
+            const areaName = newAreaName.value.trim().toUpperCase();
+            if (!areaName) {
+                showStatus('Area name required', 'error');
+                return;
+            }
+            
+            if (!areas.includes(areaName)) {
+                areas.push(areaName);
+                saveAllData();
+                updateDropdowns();
+                areaSelect.value = areaName;
+                areaModal.style.display = 'none';
+                newAreaName.value = '';
+                showStatus('Area added to registry', 'success');
+            } else {
+                showStatus('Area already exists', 'error');
+            }
+        }
+
+        // Clear all asset data
+        function clearAllAssets() {
+            assets = [];
+            saveAllData();
+            renderTable();
+            updateStats();
+            showStatus('All asset data cleared', 'success');
+        }
+
+        // Show modal with animation
+        function showModal(modal) {
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        // Hide modal with animation
+        function hideModal(modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // Initialize the app
+        function init() {
+            // Load initial data
+            loadData();
+            
+            // Event listeners
+            assetForm.addEventListener('submit', addAsset);
+            exportBtn.addEventListener('click', exportToExcel);
+            importBtn.addEventListener('click', () => {
+                importSection.style.display = 'block';
+                fileInput.value = '';
+                fileName.textContent = '';
+            });
+            cancelImport.addEventListener('click', () => {
+                importSection.style.display = 'none';
+            });
+            fileInput.addEventListener('change', importFromExcel);
+            
+            // Site and area management
+            addSiteBtn.addEventListener('click', () => {
+                showModal(siteModal);
+                newSiteName.focus();
+            });
+            
+            addAreaBtn.addEventListener('click', () => {
+                showModal(areaModal);
+                newAreaName.focus();
+            });
+            
+            saveSite.addEventListener('click', addNewSite);
+            saveArea.addEventListener('click', addNewArea);
+            
+            closeSiteModal.addEventListener('click', () => {
+                hideModal(siteModal);
+                newSiteName.value = '';
+            });
+            
+            closeAreaModal.addEventListener('click', () => {
+                hideModal(areaModal);
+                newAreaName.value = '';
+            });
+            
+            cancelAddSite.addEventListener('click', () => {
+                hideModal(siteModal);
+                newSiteName.value = '';
+            });
+            
+            cancelAddArea.addEventListener('click', () => {
+                hideModal(areaModal);
+                newAreaName.value = '';
+            });
+            
+            // Clear data functionality
+            clearDataBtn.addEventListener('click', () => {
+                showModal(clearDataModal);
+            });
+            
+            closeClearModal.addEventListener('click', () => {
+                hideModal(clearDataModal);
+            });
+            
+            cancelClear.addEventListener('click', () => {
+                hideModal(clearDataModal);
+            });
+            
+            confirmClear.addEventListener('click', () => {
+                clearAllAssets();
+                hideModal(clearDataModal);
+            });
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === siteModal) {
+                    hideModal(siteModal);
+                    newSiteName.value = '';
+                }
+                if (event.target === areaModal) {
+                    hideModal(areaModal);
+                    newAreaName.value = '';
+                }
+                if (event.target === clearDataModal) {
+                    hideModal(clearDataModal);
+                }
+            });
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>

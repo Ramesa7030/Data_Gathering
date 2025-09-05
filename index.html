@@ -515,6 +515,17 @@
                     <!-- NEW FIELDS ADDED HERE -->
                     <div class="form-row">
                         <div class="form-group">
+                            <label for="assembly">ASSEMBLY</label>
+                            <input type="text" id="assembly" placeholder="Enter assembly information">
+                        </div>
+                        <div class="form-group">
+                            <label for="item">ITEM</label>
+                            <input type="text" id="item" placeholder="Enter item details">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
                             <label for="environment">ENVIRONMENT</label>
                             <input type="text" id="environment" placeholder="(e.g., Inside building, Under shelter, Exposed to elements)">
                         </div>
@@ -577,6 +588,8 @@
                                 <th>MACHINE</th>
                                 <th>MACHINE ID</th>
                                 <th>FIELD TAG</th>
+                                <th>ASSEMBLY</th>
+                                <th>ITEM</th>
                                 <th>ENVIRONMENT</th>
                                 <th>MEDIUM</th>
                                 <th>ATMOSPHERE</th>
@@ -752,6 +765,8 @@
             const machine = document.getElementById('machine').value;
             const machineId = document.getElementById('machineId').value;
             const fieldTag = document.getElementById('fieldTag').value;
+            const assembly = document.getElementById('assembly').value;
+            const item = document.getElementById('item').value;
             const environment = document.getElementById('environment').value;
             const medium = document.getElementById('medium').value;
             const atmosphere = document.getElementById('atmosphere').value;
@@ -769,6 +784,8 @@
                 machine,
                 machineId,
                 fieldTag,
+                assembly,
+                item,
                 environment,
                 medium,
                 atmosphere,
@@ -798,7 +815,7 @@
             
             if (assets.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td colspan="10" style="text-align: center;">NO ASSETS REGISTERED</td>`;
+                row.innerHTML = `<td colspan="12" style="text-align: center;">NO ASSETS REGISTERED</td>`;
                 assetTableBody.appendChild(row);
                 totalAssets.textContent = '0 ASSETS';
                 return;
@@ -812,6 +829,8 @@
                     <td><strong>${asset.machine}</strong></td>
                     <td><code>${asset.machineId}</code></td>
                     <td>${asset.fieldTag || '-'}</td>
+                    <td>${asset.assembly || '-'}</td>
+                    <td>${asset.item || '-'}</td>
                     <td>${asset.environment || '-'}</td>
                     <td>${asset.medium || '-'}</td>
                     <td>${asset.atmosphere || '-'}</td>
@@ -884,6 +903,8 @@
                     'MACHINE': asset.machine,
                     'MACHINE ID': asset.machineId,
                     'FIELD TAG': asset.fieldTag || '',
+                    'ASSEMBLY': asset.assembly || '',
+                    'ITEM': asset.item || '',
                     'ENVIRONMENT': asset.environment || '',
                     'MEDIUM': asset.medium || '',
                     'ATMOSPHERE': asset.atmosphere || '',
@@ -938,6 +959,8 @@
                             machine: item['MACHINE'] || item['machine'] || '',
                             machineId: item['MACHINE ID'] || item['machineId'] || item['machine ID'] || '',
                             fieldTag: item['FIELD TAG'] || item['fieldTag'] || '',
+                            assembly: item['ASSEMBLY'] || item['assembly'] || '',
+                            item: item['ITEM'] || item['item'] || '',
                             environment: item['ENVIRONMENT'] || item['environment'] || '',
                             medium: item['MEDIUM'] || item['medium'] || '',
                             atmosphere: item['ATMOSPHERE'] || item['atmosphere'] || '',
@@ -1075,58 +1098,63 @@
             saveSite.addEventListener('click', addNewSite);
             saveArea.addEventListener('click', addNewArea);
             
-            closeSiteModal.addEventListener('click', () => {
-                hideModal(siteModal);
-                newSiteName.value = '';
-            });
+            closeSiteModal.addEventListener('click', () => hideModal(siteModal));
+            closeAreaModal.addEventListener('click', () => hideModal(areaModal));
+            cancelAddSite.addEventListener('click', () => hideModal(siteModal));
+            cancelAddArea.addEventListener('click', () => hideModal(areaModal));
             
-            closeAreaModal.addEventListener('click', () => {
-                hideModal(areaModal);
-                newAreaName.value = '';
-            });
-            
-            cancelAddSite.addEventListener('click', () => {
-                hideModal(siteModal);
-                newSiteName.value = '';
-            });
-            
-            cancelAddArea.addEventListener('click', () => {
-                hideModal(areaModal);
-                newAreaName.value = '';
-            });
-            
-            // Clear data functionality
-            clearDataBtn.addEventListener('click', () => {
-                showModal(clearDataModal);
-            });
-            
-            closeClearModal.addEventListener('click', () => {
-                hideModal(clearDataModal);
-            });
-            
-            cancelClear.addEventListener('click', () => {
-                hideModal(clearDataModal);
-            });
-            
+            // Clear data
+            clearDataBtn.addEventListener('click', () => showModal(clearDataModal));
+            closeClearModal.addEventListener('click', () => hideModal(clearDataModal));
+            cancelClear.addEventListener('click', () => hideModal(clearDataModal));
             confirmClear.addEventListener('click', () => {
                 clearAllAssets();
                 hideModal(clearDataModal);
             });
             
-            // Close modals when clicking outside
-            window.addEventListener('click', (event) => {
-                if (event.target === siteModal) {
-                    hideModal(siteModal);
-                    newSiteName.value = '';
-                }
-                if (event.target === areaModal) {
-                    hideModal(areaModal);
-                    newAreaName.value = '';
-                }
-                if (event.target === clearDataModal) {
-                    hideModal(clearDataModal);
-                }
+            // Close modals on outside click
+            window.addEventListener('click', (e) => {
+                if (e.target === siteModal) hideModal(siteModal);
+                if (e.target === areaModal) hideModal(areaModal);
+                if (e.target === clearDataModal) hideModal(clearDataModal);
             });
+            
+            // Initialize with some sample data if empty
+            if (assets.length === 0) {
+                assets = [
+                    {
+                        id: '1',
+                        site: 'MAIN PLANT',
+                        area: 'PRODUCTION LINE',
+                        machine: 'CONVEYOR BELT',
+                        machineId: 'CB-001',
+                        fieldTag: 'FT-001',
+                        assembly: 'Drive Assembly',
+                        item: 'Motor 5HP',
+                        environment: 'Inside building',
+                        medium: 'Packaged goods',
+                        atmosphere: 'Dusty',
+                        notes: 'Requires monthly maintenance'
+                    },
+                    {
+                        id: '2',
+                        site: 'WAREHOUSE',
+                        area: 'STORAGE',
+                        machine: 'FORKLIFT',
+                        machineId: 'FL-003',
+                        fieldTag: 'FT-002',
+                        assembly: 'Hydraulic System',
+                        item: 'Lift Cylinder',
+                        environment: 'Under shelter',
+                        medium: 'Pallets',
+                        atmosphere: 'Dry',
+                        notes: 'Recently serviced'
+                    }
+                ];
+                saveAllData();
+                renderTable();
+                updateStats();
+            }
         }
 
         // Start the app
